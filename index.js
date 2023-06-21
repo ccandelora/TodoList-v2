@@ -6,13 +6,12 @@ const mongoose = require("mongoose");
 const _ = require('lodash');
 
 const app = express();
-const port = process.env.PORT || 3000;
-const uri = process.env.MONGO_URI;
+const PORT = process.env.PORT || 3000;
 
 mongoose.set('strictQuery', false);
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(uri);
+    const conn = await mongoose.connect(process.env.MONGO_URI);
     console.log(`MongoDB connected: ${conn.connection.host}`);
   } catch (err) {
     console.error(err);
@@ -25,7 +24,7 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
-mongoose.connect(uri);
+//mongoose.connect(uri);
 //const items = [];
 //const workItems = [];
 
@@ -130,7 +129,7 @@ app.get("/:listName", function(req,res){
 });  
 
 connectDB().then(() => {
-  app.listen(port, function() {
-    console.log(`Server started on port ${port}`)
+  app.listen(PORT, function() {
+    console.log("listening to requests");
   });
 });
