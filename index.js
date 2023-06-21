@@ -1,18 +1,31 @@
 //jshint esversion:6
-
+require('dotenv').config({ path: '.env' })
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const _ = require('lodash');
 
 const app = express();
-const _ = require('lodash');
+const port = process.env.PORT || 3000;
+const uri = process.env.MONGO_URI;
+
+mongoose.set('strictQuery', false);
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(uri);
+    console.log(`MongoDB connected: ${conn.connection.host}`);
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
+  }
+};
 
 app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost:27017/todolistDB");
+mongoose.connect(uri);
 //const items = [];
 //const workItems = [];
 
@@ -59,10 +72,7 @@ app.get("/", function(req, res) {
       });
       res.redirect("/");
      }
-  });
-
-  
-
+  }); 
 });
 
 app.post("/", function(req, res){
@@ -119,8 +129,8 @@ app.get("/:listName", function(req,res){
   });  
 });  
 
-
-
-app.listen(3000, function() {
-  console.log("Server started on port 3000");
+connectDB().then(() => {
+  app.listen(port, function() {
+    console.log(`Server started on port ${port}`)
+  });
 });
